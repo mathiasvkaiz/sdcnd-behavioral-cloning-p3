@@ -11,7 +11,7 @@ from keras.layers import MaxPooling2D
 
 
 lines = []
-correction = 0.2
+correction = 0.0
 with open('./data/driving_log.csv') as csvfile:
 	reader = csv.reader(csvfile)
 	print("Process images.")
@@ -64,12 +64,11 @@ def generator(samples, batch_size=32):
 			yield sklearn.utils.shuffle(X_train, y_train)
 
 # split data in test and validation
-print("Create test and validation set.")
-train_samples, validation_samples = train_test_split(augmented_samples, test_size=0.2)
-
+#print("Create test and validation set.")
+#train_samples, validation_samples = train_test_split(augmented_samples, test_size=0.2)
 # create generators
-train_generator = generator(train_samples, batch_size=32)
-validation_generator = generator(validation_samples, batch_size=32)
+#train_generator = generator(train_samples, batch_size=768)
+#validation_generator = generator(validation_samples, batch_size=768)
 
 # Create model
 print("Create model.")
@@ -87,13 +86,17 @@ model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
-# compile and fit using generator
+# compile and fit
 print("Start training.")
 model.compile(loss='mse', optimizer='adam')
-model.fit_generator(train_generator, 
-		    samples_per_epoch=len(train_samples),
-		    validation_data=validation_generator,
-		    nb_val_samples=len(validation_samples), nb_epoch=3)
+#model.fit_generator(train_generator, 
+#		    samples_per_epoch=len(train_samples),
+#		    validation_data=validation_generator,
+#		    nb_val_samples=len(validation_samples), nb_epoch=5)
+
+X_train = np.array([sample[0] for sample in augmented_samples])
+y_train = np.array([sample[1] for sample in augmented_samples])
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
 
 # save model data
 print("Save model.")
