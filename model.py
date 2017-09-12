@@ -17,7 +17,7 @@ dict_camera_to_correction = { 'center': 0.0, 'left': 0.25, 'right': -0.25 }
 
 print("Process csv data.")
 samples = []
-with open(data_path + './driving_log.csv') as csvfile:
+with open(data_path + '/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         samples.append(line)
