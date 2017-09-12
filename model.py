@@ -25,14 +25,14 @@ with open(data_path + '/driving_log.csv') as csvfile:
 # method for reading images from path
 def get_random_image_and_steering(sample):
 	# randomly chhose for augmentation
-	camera = np.random.choice(camera)
+	choosen_camera = np.random.choice(camera)
 
-	source_path = sample[dict_camera_to_idx[camera]]
+	source_path = sample[dict_camera_to_idx[choosen_camera]]
 	filename = source_path.split('/')[-1]
 	current_path = data_path + '/IMG/' + filename
 	
 	image = cv2.imread(current_path)
-	steering = float(sample[3]) +  dict_camera_to_correction[camera]
+	steering = float(sample[3]) +  dict_camera_to_correction[choosen_camera]
 	
 	return image, steering
 
@@ -57,7 +57,7 @@ def perform_brightness(image):
 	return image
 
 # generator method for returning only needed data
-def generator(samples, batch_size=256, img_height=80, img_width=150):
+def generator(samples, batch_size=256, img_height=64, img_width=128):
 	num_samples = len(samples)
 	while (True):
 		sklearn.utils.shuffle(samples)
@@ -65,17 +65,18 @@ def generator(samples, batch_size=256, img_height=80, img_width=150):
 			batch_samples = samples[offset:offset+batch_size]
 
 			images = []
-			angles = []
+			steerings = []
 			for batch_sample in batch_samples:
 
 				image, steering = get_random_image_and_steering(batch_sample)
 				image, steering = decide_to_flip(image, steering)
 
 				#resize image
-				resized_image = cv2.resize(center_image, (img_height, img_width), interpolation=cv2.INTER_AREA)
+				#resized_image = cv2.resize(image, (img_height, img_width), interpolation=cv2.INTER_AREA)
+				resized_image = image
 
 				# perform more augmentations
-				augmented_image = perform_brightness(image)
+				augmented_image = perform_brightness(resized_image)
 
 				# construct arrays
 				images.append(augmented_image)
@@ -90,7 +91,7 @@ def generator(samples, batch_size=256, img_height=80, img_width=150):
 
 # split data in test and validation
 print("Create test and validation set.")
-train_samples, validation_samples = train_test_split(augmented_samples, test_size=0.2)
+train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 # create generators
 print("Generate generators.")
@@ -99,14 +100,15 @@ validation_generator = generator(validation_samples, batch_size=128)
 
 # Create model
 print("Create model.")
+row, col, ch = 160, 320, 3
 model = Sequential()
-model.add(Lambda(lambda x: x / 127.5 - 1, input_shape=(160,320,3)))
-model.add(Cropping2D(cropping=((70,25), (0,0))))
-model.add(Convolution2D(24,5,5,subsample=(2,2),activation='elu'))
-model.add(Convolution2D(36,5,5,subsample=(2,2),activation='elu'))
-model.add(Convolution2D(48,5,5,subsample=(2,2),activation='elu'))
-model.add(Convolution2D(64,3,3,activation='elu'))
-model.add(Convolution2D(64,3,3,activation='elu'))
+model.add(Lambda(lambda x: x / 127.5 - 1, input_shape=(row, col, ch )))
+model.add(Cropping2D(cropping=((70, 25), (0, 0))))
+model.add(Convolution2D(24, 5, 5,subsample=(2, 2),activation='elu'))
+model.add(Convolution2D(36, 5, 5,subsample=(2, 2),activation='elu'))
+model.add(Convolution2D(48, 5, 5,subsample=(2, 2),activation='elu'))
+model.add(Convolution2D(64, 3, 3,activation='elu'))
+model.add(Convolution2D(64, 3, 3,activation='elu'))
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Dense(50))
