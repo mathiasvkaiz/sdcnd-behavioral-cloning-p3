@@ -95,8 +95,8 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 # create generators
 print("Generate generators.")
-train_generator = generator(train_samples, batch_size=128)
-validation_generator = generator(validation_samples, batch_size=128)
+train_generator = generator(train_samples, batch_size=256)
+validation_generator = generator(validation_samples, batch_size=256)
 
 # Create model
 print("Create model.")
@@ -121,7 +121,7 @@ model.compile(loss='mse', optimizer='adam')
 model.fit_generator(train_generator, 
 		    samples_per_epoch=len(train_samples),
 		    validation_data=validation_generator,
-		    nb_val_samples=len(validation_samples), nb_epoch=5)
+		    nb_val_samples=len(validation_samples), nb_epoch=10)
 
 # save model data
 print("Save model.")
