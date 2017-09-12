@@ -10,13 +10,14 @@ from keras.layers import Convolution2D
 from keras.layers import MaxPooling2D
 
 # global variables
+data_path = './data'
 camera = ['center', 'left', 'right']
 dict_camera_to_idx = { 'center': 0, 'left': 1, 'right': 2 }
 dict_camera_to_correction = { 'center': 0.0, 'left': 0.25, 'right': -0.25 }
 
 print("Process csv data.")
 samples = []
-with open('./driving_log.csv') as csvfile:
+with open(data_path + './driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         samples.append(line)
@@ -28,7 +29,7 @@ def get_random_image_and_steering(sample):
 
 	source_path = sample[dict_camera_to_idx[camera]]
 	filename = source_path.split('/')[-1]
-	current_path = './data/IMG/' + filename
+	current_path = data_path + '/IMG/' + filename
 	
 	image = cv2.imread(current_path)
 	steering = float(sample[3]) +  dict_camera_to_correction[camera]
