@@ -45,21 +45,21 @@ def decide_to_flip(image, steering):
 	
 	return image, steering
 
-def perform_brightness(image)
+def perform_brightness(image):
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    
-    random_brightness = .1 + np.random.uniform()
-    image[:,:,2] = image[:,:,2] * random_brightness
-    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+	image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
 
-    return image
+	random_brightness = .1 + np.random.uniform()
+	image[:,:,2] = image[:,:,2] * random_brightness
+	image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+
+	return image
 
 # generator method for returning only needed data
 def generator(samples, batch_size=256, img_height=80, img_width=150):
 	num_samples = len(samples)
-	while True:
-        sklearn.utils.shuffle(samples)
+	while (True):
+		sklearn.utils.shuffle(samples)
 		for offset in range(0, num_samples, batch_size):
 			batch_samples = samples[offset:offset+batch_size]
 
